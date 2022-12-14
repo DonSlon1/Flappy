@@ -1,5 +1,5 @@
 #include "raylib.h"
-#include <stdio.h>
+
 
 typedef struct bird{
     float x;
