@@ -3,30 +3,7 @@
 #include <time.h>
 #include <math.h>
 
-Rectangle RotateRec(Rectangle rec, float angle)
-{
-    Rectangle result = { 0 };
 
-    float c = cosf(angle);
-    float s = sinf(angle);
-
-    Vector2 tl = { rec.x, rec.y };
-    Vector2 tr = { rec.x + rec.width, rec.y };
-    Vector2 bl = { rec.x, rec.y + rec.height };
-    Vector2 br = { rec.x + rec.width, rec.y + rec.height };
-
-    Vector2 tl_ = { tl.x*c - tl.y*s, tl.x*s + tl.y*c };
-    Vector2 tr_ = { tr.x*c - tr.y*s, tr.x*s + tr.y*c };
-    Vector2 bl_ = { bl.x*c - bl.y*s, bl.x*s + bl.y*c };
-    Vector2 br_ = { br.x*c - br.y*s, br.x*s + br.y*c };
-
-    result.x = tl_.x;
-    result.y = tl_.y;
-    result.width = tr_.x - tl_.x;
-    result.height = bl_.y - tl_.y;
-
-    return result;
-}
 
 typedef struct bird{
     float x;
