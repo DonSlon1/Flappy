@@ -54,7 +54,9 @@ int main() {
     Texture2D FlappyUp = LoadTexture("src/Flappy_Up.png");
     Texture2D Pipe = LoadTexture("src/pipe48x10.png");
     Texture2D Top = LoadTexture("src/Vrch48x22.png");
+    Image Icon = LoadImage("src/Flappy_Start.png");
 
+    SetWindowIcon(Icon);
     SetTargetFPS(120);
     float up=0;
     while (!WindowShouldClose()){
@@ -62,9 +64,6 @@ int main() {
             mousePoint = GetMousePosition();
             if(CheckCollisionPointRec(mousePoint,Button) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
 
-                Restart=true;
-            }
-            if (IsKeyPressed(KEY_SPACE)) {
                 Restart=true;
             }
             if(Restart){
@@ -195,6 +194,7 @@ int main() {
 
     CloseWindow();
 
+    UnloadImage(Icon);
     UnloadTexture(Background);
     UnloadTexture(FlappyStart);
     UnloadTexture(FlappyUp);

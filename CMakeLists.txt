@@ -4,6 +4,8 @@ project(Flappy)
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+
+
 # Dependencies
 set(RAYLIB_VERSION 4.2.0)
 find_package(raylib ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
@@ -25,7 +27,7 @@ endif()
 # Our Project
 
 add_executable(${PROJECT_NAME} main.c)
-#set(raylib_VERBOSE 1)
+
 target_link_libraries(${PROJECT_NAME} raylib)
 
 # Web Configurations
@@ -34,9 +36,3 @@ if (${PLATFORM} STREQUAL "Web")
     set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
 endif()
 
-# Checks if OSX and links appropriate frameworks (Only required on MacOS)
-if (APPLE)
-    target_link_libraries(${PROJECT_NAME} "-framework IOKit")
-    target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
-    target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
-endif()
