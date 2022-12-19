@@ -47,7 +47,7 @@ int main() {
     ptak.Rotation=0;
     Vector2 mousePoint = { 0.0f, 0.0f };
     FullPipeGen();
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera");
+    InitWindow(screenWidth, screenHeight, "Flappy Bird");
     Texture2D Background = LoadTexture("src/Pozadi.png");
     Texture2D Ground = LoadTexture("src/Spodek.png");
     Texture2D FlappyStart = LoadTexture("src/Flappy_Start.png");
