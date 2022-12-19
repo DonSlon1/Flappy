@@ -19,29 +19,18 @@ typedef struct pip{
 }pipe;
 
 pipe Pipes[10];
+Vector2 Center;
+void CenterCalculate(float sx,float sy,float rotation);
+void FullPipeGen();
 void PipeGen(Texture2D Pipe,Texture2D Top);
 bool collision(float PtakX,float PtakY,float PtakR);
 
 int main() {
 
     SetRandomSeed(time(NULL));
-    int randomnum;
-    Pipes[0].y=350;
-    Pipes[0].x=1024;
-    for (int i = 1; i < 10; ++i) {
-        if(Pipes[i-1].y-150>=42+64 && Pipes[i-1].y+150<=768-42-64){
-            randomnum = GetRandomValue((int )Pipes[i-1].y-150,(int )Pipes[i-1].y+150);
-
-        }else if(Pipes[i-1].y-150>=42+64){
-            randomnum = GetRandomValue((int )Pipes[i-1].y-150,768-42-64);
-        }else {
-            randomnum = GetRandomValue(42+64,(int )Pipes[i-1].y+150);
-        }
-        Pipes[i].y=(float )randomnum;
-        Pipes[i].x=Pipes[i-1].x+200;
-    }
-
-
+    int MaxScore=0;
+    int score=0;
+    Rectangle Button={(1024.0f/2),340,100,30};
 
 
     const int screenWidth = 1024;
@@ -50,12 +39,14 @@ int main() {
     int dir=1;
     bool down = false;
     bool start = false;
-    bool end = false;
+    bool end = false,Restart=false;
     float d=0;
     Bird ptak ;
     ptak.x=200;
     ptak.y=364;
     ptak.Rotation=0;
+    Vector2 mousePoint = { 0.0f, 0.0f };
+    FullPipeGen();
     InitWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera");
     Texture2D Background = LoadTexture("src/Pozadi.png");
     Texture2D Ground = LoadTexture("src/Spodek.png");
@@ -68,14 +59,34 @@ int main() {
     float up=0;
     while (!WindowShouldClose()){
         if(end){
+            mousePoint = GetMousePosition();
+            if(CheckCollisionPointRec(mousePoint,Button) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
 
+                Restart=true;
+            }
+            if (IsKeyPressed(KEY_SPACE)) {
+                Restart=true;
+            }
+            if(Restart){
+                score=0;
+                d=0;
+                dir=1;
+                FullPipeGen();
+                ptak.x=200;
+                ptak.y=364;
+                ptak.Rotation=0;
+                down = false;
+                start = false;
+                end = false;
+                Restart=false;
+            }
         } else {
             move += -0.5f;
             if (move <= -(float) Ground.width) move = 0;
 
             if (IsKeyPressed(KEY_SPACE)) {
                 start = true;
-                up += 70;
+                up = 70;
 
             }
             if (start) {
@@ -107,6 +118,14 @@ int main() {
                     }
 
                 }
+                CenterCalculate(ptak.x,ptak.y+40,ptak.Rotation);
+                if(Pipes[0].x == 200-50 || Pipes[1].x == 200-50){
+                    score++;
+                    if(score>=MaxScore){
+                        MaxScore=score;
+                    }
+                }
+
                 if(collision(ptak.x,ptak.y,ptak.Rotation)){
                     end=true;
 
@@ -127,12 +146,13 @@ int main() {
         ClearBackground(GetColor(0x052c46ff));
 
         DrawTexture(Background,0,0,WHITE);
-
-        DrawRectanglePro((Rectangle){ptak.x,ptak.y,40,40},(Vector2){0,0},0,WHITE);
         PipeGen(Pipe,Top);
 
 
-
+        if(!end){
+            Vector2 FontSize=MeasureTextEx(GetFontDefault(),TextFormat("%d",score),50,8);
+            DrawTextEx(GetFontDefault(),TextFormat("%d",score), (Vector2){1024.0f/2-FontSize.x/2, 150},50,8,WHITE);
+        }
         if(!start){
 
             DrawTextureEx(FlappyStart, (Vector2) {200, ptak.y}, 0.0f, 1.0f, WHITE);
@@ -144,6 +164,29 @@ int main() {
         else  {
             DrawTextureEx(FlappyUp, (Vector2) {200, ptak.y}, 0.0f, 1.0f, WHITE);
         }
+        if(end){
+
+            DrawRectangleRounded((Rectangle){(1024.0f/2)-0.2f,150-0.2f,100+2,150+2},0.2f,1, (Color){222,216,149,255});
+            DrawRectangleRoundedLines((Rectangle){1024.0f/2,150,100,150},0.2f,1,5,BLACK);
+            Vector2 FontC= MeasureTextEx(GetFontDefault(),"SCORE",10,5);
+            DrawTextEx(GetFontDefault(),"SCORE",(Vector2){1024.0f/2+50-FontC.x/2,150+60-FontC.x/2},10,5,(Color){252, 120, 88,255});
+
+            FontC= MeasureTextEx(GetFontDefault(), TextFormat("%d",score),25,5);
+            DrawTextEx(GetFontDefault(),TextFormat("%d",score),(Vector2){1024.0f/2+50-FontC.x/2,150+60-FontC.x/2},25,5,WHITE);
+
+            FontC= MeasureTextEx(GetFontDefault(),"MAX SCORE",10,5);
+            DrawTextEx(GetFontDefault(),"MAX SCORE",(Vector2){1024.0f/2+50-FontC.x/2,150+50-FontC.x/2+80},10,5,(Color){252, 120, 88,255});
+
+            FontC= MeasureTextEx(GetFontDefault(), TextFormat("%d",MaxScore),25,5);
+            DrawTextEx(GetFontDefault(),TextFormat("%d",MaxScore),(Vector2){1024.0f/2+50-FontC.x/2,150+50+60-FontC.x/2},25,5,WHITE);
+            DrawRectangleRec((Rectangle){(1024.0f/2)-6,340-6,114,46},BLACK);
+            DrawRectangleRec((Rectangle){(1024.0f/2)-4,340-4,108,38},WHITE);
+            DrawRectangleRec((Rectangle){(1024.0f/2),340,100,30},(Color){232, 97, 1,255});
+
+            FontC= MeasureTextEx(GetFontDefault(),"RESTART",17,3);
+            DrawTextEx(GetFontDefault(),"RESTART",(Vector2){(1024.0f/2)+50-FontC.x/2    ,340+15-FontC.y/2},17,3,WHITE);
+
+        }
         DrawTextureEx(Ground, (Vector2){move , 704.0f}, 0.0f, 1.0f, WHITE);
         DrawTextureEx(Ground, (Vector2){(float )Ground.width + move, 704.0f}, 0.0f, 1.0f, WHITE);
 
@@ -151,6 +194,7 @@ int main() {
     }
 
     CloseWindow();
+
     UnloadTexture(Background);
     UnloadTexture(FlappyStart);
     UnloadTexture(FlappyUp);
@@ -192,23 +236,56 @@ void PipeGen(Texture2D Pipe,Texture2D Top){
 }
 
 bool collision(float PtakX,float PtakY,float PtakR){
-    Rectangle Ptak = {PtakX,PtakY,40,40};
 
     if(PtakY+40 >= 704){
         return true;
     }
-    if(CheckCollisionRecs(Ptak,(Rectangle){Pipes[0].x,Pipes[0].y,48,768}) || CheckCollisionRecs(Ptak,(Rectangle){Pipes[1].x,Pipes[1].y,48,768})){
+    if(CheckCollisionCircleRec(Center,16,(Rectangle){Pipes[0].x,Pipes[0].y,48,768})|| CheckCollisionCircleRec(Center,16,(Rectangle){Pipes[1].x,Pipes[1].y,48,768})){
         return true;
     }
-    if(CheckCollisionRecs(Ptak,(Rectangle){Pipes[0].x,0,48,Pipes[0].y-120}) || CheckCollisionRecs(Ptak,(Rectangle){Pipes[1].x,0,48,Pipes[1].y-120})){
+    if(CheckCollisionCircleRec(Center,16,(Rectangle){Pipes[0].x,0,48,Pipes[0].y-120}) || CheckCollisionCircleRec(Center,16,(Rectangle){Pipes[1].x,0,48,Pipes[1].y-120})){
         return true;
     }
     if(PtakY<0){
 
-        if(CheckCollisionRecs(Ptak,(Rectangle){Pipes[0].x,PtakY-100,48,-1*(PtakY-100)}) ||CheckCollisionRecs(Ptak,(Rectangle){Pipes[1].x,PtakY-100,48,-1*(PtakY-100)})){
+        if(CheckCollisionCircleRec(Center,16,(Rectangle){Pipes[0].x,PtakY-100,48,-1*(PtakY-100)}) ||CheckCollisionCircleRec(Center,16,(Rectangle){Pipes[1].x,PtakY-100,48,-1*(PtakY-100)})){
             return true;
         }
     }
     return false;
 }
+void CenterCalculate(float sx,float sy,float rotation){
 
+
+    //stupně
+    double alfa=rotation*(PI/180);
+    double beta=(180-(alfa*(180/PI)+90))*(PI/180);
+
+    //delka strran
+    double b=(sin(beta)/ sin(90*(PI/180)))*40;
+    double a=(sin(alfa)/ sin(beta))*b;
+
+    Vector2 B={sx+b,sy-a};
+    Vector2 C={sx-a,sy-b};
+    Center.x = (B.x+C.x)/2;
+    Center.y = ((B.y+C.y)/2);
+}
+
+void FullPipeGen(){
+    int randomnum;
+    Pipes[0].y=350;
+    Pipes[0].x=1024;
+
+    for (int i = 1; i < 10; ++i) {
+        if(Pipes[i-1].y-150>=42+64 && Pipes[i-1].y+150<=768-42-64){
+            randomnum = GetRandomValue((int )Pipes[i-1].y-150,(int )Pipes[i-1].y+150);
+
+        }else if(Pipes[i-1].y-150>=42+64){
+            randomnum = GetRandomValue((int )Pipes[i-1].y-150,768-42-64);
+        }else {
+            randomnum = GetRandomValue(42+64,(int )Pipes[i-1].y+150);
+        }
+        Pipes[i].y=(float )randomnum;
+        Pipes[i].x=Pipes[i-1].x+200;
+    }
+}
