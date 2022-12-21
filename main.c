@@ -1,3 +1,5 @@
+// gcc main.c -o Flappy_Bird -O1 -Wall -std=c99 -Wno-missing-braces -L ./lib/ -I ./include  -lraylib -lopengl32 -lgdi32 -lwinmm
+
 #include "raylib.h"
 #include <stdio.h>
 #include <time.h>
@@ -67,7 +69,14 @@ int main() {
     ptak.Rotation=0;
     Vector2 mousePoint = { 0.0f, 0.0f };
     FullPipeGen();
+
+
     InitWindow(screenWidth, screenHeight, "Flappy Bird");
+    InitAudioDevice();
+
+
+    Sound uwu = LoadSound("src/uwu.mp3");
+    Sound Hit = LoadSound("src/hit.mp3");
     Texture2D Background = LoadTexture("src/Pozadi.png");
     Texture2D Ground = LoadTexture("src/Spodek.png");
     Texture2D FlappyStart = LoadTexture("src/Flappy_Start.png");
@@ -79,6 +88,9 @@ int main() {
     SetWindowIcon(Icon);
     SetTargetFPS(120);
     float up=0;
+
+    SetSoundVolume(Hit,0.2f);
+    SetSoundVolume(uwu,0.2f);
     while (!WindowShouldClose()){
         if(end){
             mousePoint = GetMousePosition();
@@ -145,11 +157,12 @@ int main() {
                         file = fopen("./Max_Score.txt","w+");
                         putw(MaxScore,file);
                     }
+                    PlaySound(uwu);
                 }
 
                 if(collision(ptak.x,ptak.y,ptak.Rotation)){
                     end=true;
-
+                    PlaySound(Hit);
                 }
             } else{
                 if(ptak.y>=364+25){
@@ -215,7 +228,9 @@ int main() {
     }
 
     CloseWindow();
-
+    StopSoundMulti();
+    UnloadSound(Hit);
+    UnloadSound(uwu);
     UnloadImage(Icon);
     UnloadTexture(Background);
     UnloadTexture(FlappyStart);
