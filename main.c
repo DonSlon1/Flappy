@@ -1,10 +1,9 @@
-// gcc main.c -o Flappy_Bird -O1 -Wall -std=c99 -Wno-missing-braces -L ./lib/ -I ./include  -lraylib -lopengl32 -lgdi32 -lwinmm
+//gcc main.c -o Flappy_Bird -O1 -Wall -std=c99 -Wno-missing-braces -L ./lib/ -I ./include  -lraylib -lopengl32 -lgdi32 -lwinmm ./src/my.res
 
 #include "raylib.h"
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 
@@ -295,12 +294,12 @@ void CenterCalculate(float sx,float sy,float rotation){
 
 
     //stupně
-    double alfa=rotation*(PI/180);
-    double beta=(180-(alfa*(180/PI)+90))*(PI/180);
+    float alfa=rotation*(PI/180);
+    float beta=(180-(alfa*(180/PI)+90))*(PI/180);
 
     //delka strran
-    double b=(sin(beta)/ sin(90*(PI/180)))*40;
-    double a=(sin(alfa)/ sin(beta))*b;
+    float b=(sinf(beta)/ sinf(90*(PI/180)))*40;
+    float a=(sinf(alfa)/ sinf(beta))*b;
 
     Vector2 B={sx+b,sy-a};
     Vector2 C={sx-a,sy-b};
