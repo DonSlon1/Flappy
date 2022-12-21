@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-
+#include <stdlib.h>
+#include <unistd.h>
 
 
 typedef struct bird{
@@ -26,15 +27,34 @@ void PipeGen(Texture2D Pipe,Texture2D Top);
 bool collision(float PtakX,float PtakY,float PtakR);
 
 int main() {
+    FILE *file;
 
-    SetRandomSeed(time(NULL));
+
     int MaxScore=0;
+    if (access("./Max_Score.txt", F_OK) == 0) {
+        // file exists
+        file = fopen("./Max_Score.txt","r");
+        MaxScore = getw(file);
+    } else {
+        // file doesn't exist
+        file = fopen("./Max_Score.txt","w");
+        putw(0,file);
+
+
+    }
+
+
+    fclose(file);
+    //free(file);
+    SetRandomSeed(time(NULL));
+
     int score=0;
     Rectangle Button={(1024.0f/2),340,100,30};
 
 
     const int screenWidth = 1024;
     const int screenHeight = 768;
+
     float move=0;
     int dir=1;
     bool down = false;
@@ -122,6 +142,8 @@ int main() {
                     score++;
                     if(score>=MaxScore){
                         MaxScore=score;
+                        file = fopen("./Max_Score.txt","w+");
+                        putw(MaxScore,file);
                     }
                 }
 
